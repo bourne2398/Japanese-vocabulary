@@ -1,4 +1,4 @@
-const CACHE_NAME = 'japanese-vocabulary-public-v2';
+const CACHE_NAME = 'japanese-vocabulary-public-v3';
 const APP_SHELL = [
   './',
   './index.html',
