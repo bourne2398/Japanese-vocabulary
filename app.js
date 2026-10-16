@@ -8,6 +8,18 @@
   let known = new Set();
   let activeCard = null;
   let isFlipped = false;
+  let sessionStartedAt = 0;
+  let sessionRecorded = false;
+  const STORAGE_KEY = 'japanese-vocabulary-progress-v1';
+  const readProgress = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      return { mastered: new Set(Array.isArray(saved.mastered) ? saved.mastered : []), sessions: Array.isArray(saved.sessions) ? saved.sessions : [] };
+    } catch (_) { return { mastered: new Set(), sessions: [] }; }
+  };
+  const savedProgress = readProgress();
+  const mastered = savedProgress.mastered;
+  let sessions = savedProgress.sessions;
 
   const lessonNumbers = Array.from({ length: 78 }, (_, i) => i + 1).filter(n => Array.isArray(DATA[String(n)]));
   const uniqueCards = (lessons) => {
@@ -26,6 +38,55 @@
     });
     return cards;
   };
+
+  function saveProgress() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ mastered: [...mastered], sessions: sessions.slice(-100) })); } catch (_) { /* Private browsing or full storage: current session still works. */ }
+  }
+
+  function renderProgress() {
+    const allCards = uniqueCards(lessonNumbers);
+    const masteredCount = allCards.reduce((sum, card) => sum + (mastered.has(card.id) ? 1 : 0), 0);
+    const percent = allCards.length ? Math.round(masteredCount / allCards.length * 100) : 0;
+    $('overall-mastered').textContent = masteredCount + ' / ' + allCards.length;
+    $('overall-fill').style.width = percent + '%';
+    $('overall-percent').textContent = percent + '% complete';
+    $('sessions-total').textContent = sessions.length;
+    $('overall-remaining').textContent = allCards.length - masteredCount;
+    const list = $('progress-lesson-list');
+    list.innerHTML = '';
+    lessonNumbers.forEach(lesson => {
+      const cards = uniqueCards([lesson]);
+      const total = cards.length;
+      const count = cards.reduce((sum, card) => sum + (mastered.has(card.id) ? 1 : 0), 0);
+      const pct = total ? Math.round(count / total * 100) : 0;
+      const row = document.createElement('div');
+      row.className = 'progress-lesson-row';
+      const top = document.createElement('div'); top.className = 'progress-lesson-top';
+      const name = document.createElement('strong'); name.textContent = 'Lesson ' + lesson;
+      const numbers = document.createElement('span'); numbers.textContent = count + ' / ' + total + ' · ' + pct + '%';
+      top.append(name, numbers);
+      const track = document.createElement('div'); track.className = 'lesson-progress-track';
+      const fill = document.createElement('span'); fill.style.width = pct + '%'; track.appendChild(fill);
+      row.append(top, track); list.appendChild(row);
+    });
+    const history = $('session-history'); history.innerHTML = '';
+    const recent = sessions.slice(-8).reverse();
+    if (!recent.length) {
+      const empty = document.createElement('p'); empty.className = 'history-empty'; empty.textContent = 'No completed sessions yet. Finish a review to see it here.'; history.appendChild(empty);
+    } else {
+      recent.forEach(session => {
+        const row = document.createElement('div'); row.className = 'history-row';
+        const main = document.createElement('div');
+        const title = document.createElement('strong'); title.textContent = session.lessons.length === 78 ? 'All 78 lessons' : session.lessons.length === 1 ? 'Lesson ' + session.lessons[0] : session.lessons.length + ' lessons';
+        const date = document.createElement('small');
+        const parsed = new Date(session.date);
+        date.textContent = (Number.isNaN(parsed.getTime()) ? 'Completed session' : parsed.toLocaleString()) + ' · ' + Math.max(1, Math.round((session.duration || 0) / 60000)) + ' min';
+        main.append(title, date);
+        const score = document.createElement('span'); score.className = 'history-score'; score.textContent = session.known + ' / ' + session.total + ' known';
+        row.append(main, score); history.appendChild(row);
+      });
+    }
+  }
 
   function renderLessonGrid() {
     const query = $('lesson-search').value.trim().toLowerCase();
@@ -73,9 +134,10 @@
   }
 
   function showScreen(id) {
-    ['setup-screen', 'review-screen', 'complete-screen'].forEach(screenId => {
+    ['setup-screen', 'progress-screen', 'review-screen', 'complete-screen'].forEach(screenId => {
       $(screenId).hidden = screenId !== id;
     });
+    if (id === 'progress-screen') renderProgress();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -91,6 +153,8 @@
     known = new Set();
     activeCard = null;
     isFlipped = false;
+    sessionStartedAt = Date.now();
+    sessionRecorded = false;
     $('review-lessons-label').textContent = lessons.length === 78 ? 'All 78 lessons' : lessons.length === 1 ? 'Lesson ' + lessons[0] : lessons.length + ' lessons selected';
     showScreen('review-screen');
     renderCurrentCard();
@@ -133,6 +197,8 @@
     if (!activeCard || !queue.length) return;
     const card = queue.shift();
     known.add(card.id);
+    mastered.add(card.id);
+    saveProgress();
     updateProgress();
     if (queue.length === 0) showCompletion();
     else renderCurrentCard();
@@ -142,6 +208,8 @@
     if (!activeCard || !queue.length) return;
     const card = queue.shift();
     card.retries += 1;
+    mastered.delete(card.id);
+    saveProgress();
     queue.push(card);
     renderCurrentCard();
     updateProgress();
@@ -159,6 +227,12 @@
   }
 
   function showCompletion() {
+    if (!sessionRecorded && deck.length) {
+      sessions.push({ date: new Date().toISOString(), lessons: [...selected].sort((a,b) => a-b), known: known.size, total: deck.length, duration: Date.now() - sessionStartedAt });
+      sessions = sessions.slice(-100);
+      sessionRecorded = true;
+      saveProgress();
+    }
     $('final-known').textContent = known.size;
     $('final-lessons').textContent = selected.size;
     showScreen('complete-screen');
@@ -185,6 +259,8 @@
     });
   });
   $('start-review').addEventListener('click', startReview);
+  $('show-progress').addEventListener('click', () => showScreen('progress-screen'));
+  $('progress-back').addEventListener('click', () => showScreen('setup-screen'));
   $('flashcard').addEventListener('click', flipCard);
   $('know').addEventListener('click', markKnown);
   $('dont-know').addEventListener('click', markUnknown);
