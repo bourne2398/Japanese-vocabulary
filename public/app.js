@@ -30,6 +30,8 @@
           id: String(lesson) + '-' + index,
           lesson,
           jp: String(entry.jp == null ? '' : entry.jp),
+          furi: String(entry.furi == null ? '' : entry.furi),
+          kanji: String(entry.kanji == null ? '' : entry.kanji),
           en: String(entry.en == null ? '' : entry.en),
           sequence: cards.length + 1,
           retries: 0
@@ -181,7 +183,11 @@
     $('flashcard').setAttribute('aria-label', 'Reveal English meaning for ' + activeCard.jp);
     $('card-jp').hidden = false;
     $('card-en').hidden = true;
-    $('card-jp').textContent = activeCard.jp || '—';
+    const hasKanji = (value) => /[\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ]/.test(value || '');
+    const kanjiForm = hasKanji(activeCard.kanji) ? activeCard.kanji : (hasKanji(activeCard.jp) && activeCard.furi && activeCard.jp !== activeCard.furi ? activeCard.jp : '');
+    $('card-kanji').textContent = kanjiForm;
+    $('card-kanji').hidden = !kanjiForm;
+    $('card-jp').textContent = activeCard.furi || activeCard.jp || '—';
     $('card-en').textContent = activeCard.en || 'No English meaning listed';
     $('card-lesson').textContent = 'LESSON ' + activeCard.lesson;
     $('card-side').textContent = 'JAPANESE';
@@ -195,6 +201,7 @@
     if (!activeCard || !queue.length) return;
     isFlipped = !isFlipped;
     $('card-jp').hidden = isFlipped;
+    $('card-kanji').hidden = isFlipped || !$('card-kanji').textContent;
     $('card-en').hidden = !isFlipped;
     $('card-side').textContent = isFlipped ? 'ENGLISH MEANING' : 'JAPANESE';
     $('card-hint').innerHTML = isFlipped ? '<span aria-hidden="true">↻</span> Tap to see Japanese' : '<span aria-hidden="true">↻</span> Tap to reveal meaning';
