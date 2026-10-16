@@ -201,6 +201,7 @@
     if (!activeCard || !queue.length) return;
     isFlipped = !isFlipped;
     $('card-jp').hidden = isFlipped;
+    $('card-kanji').hidden = isFlipped || !$('card-kanji').textContent;
     $('card-en').hidden = !isFlipped;
     $('card-side').textContent = isFlipped ? 'ENGLISH MEANING' : 'JAPANESE';
     $('card-hint').innerHTML = isFlipped ? '<span aria-hidden="true">↻</span> Tap to see Japanese' : '<span aria-hidden="true">↻</span> Tap to reveal meaning';
