@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const DATA = window.LESSON_DATA_1_78_NO_KANJI || {};
+  const DATA = window.LESSON_DATA_1_78 || {};
   const $ = (id) => document.getElementById(id);
   const selected = new Set();
   let deck = [];
@@ -11,15 +11,11 @@
 
   const lessonNumbers = Array.from({ length: 78 }, (_, i) => i + 1).filter(n => Array.isArray(DATA[String(n)]));
   const uniqueCards = (lessons) => {
-    const seen = new Set();
     const cards = [];
     lessons.forEach(lesson => {
       (DATA[String(lesson)] || []).forEach((entry, index) => {
-        const key = String(entry.jp || '') + '\u0000' + String(entry.en || '');
-        if (seen.has(key)) return;
-        seen.add(key);
         cards.push({
-          id: String(lesson) + '-' + index + '-' + cards.length,
+          id: String(lesson) + '-' + index,
           lesson,
           jp: String(entry.jp == null ? '' : entry.jp),
           en: String(entry.en == null ? '' : entry.en),
