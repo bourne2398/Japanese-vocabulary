@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./public/lesson-data-1-78.js"></script>
   <script defer src="./app.js"></script>
+  <script>if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));</script>
 </head>
 <body>
   <div class="app-shell">
