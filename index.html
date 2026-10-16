@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="Review Japanese vocabulary from Lessons 1–78 with a simple, mobile-friendly flashcard app.">
+  <title>Japanese Vocabulary • Flashcards</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./public/lesson-data-1-78-no-kanji.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Japanese Vocabulary home">
+        <span class="brand-mark">あ</span>
+        <span><strong>Japanese Vocabulary</strong><small>Lessons 1–78 · Flashcard review</small></span>
+      </a>
+      <div class="top-pill"><span class="status-dot"></span> Study mode</div>
+    </header>
+
+    <main>
+      <section id="setup-screen" class="screen">
+        <div class="intro">
+          <div class="eyebrow">YOUR DAILY PRACTICE</div>
+          <h1>Small steps.<br><span>Stronger Japanese.</span></h1>
+          <p>Choose the lessons you want to practise. Keep reviewing until every card is marked <strong>Know</strong>.</p>
+        </div>
+
+        <section class="panel lesson-panel" aria-labelledby="lesson-title">
+          <div class="panel-heading">
+            <div>
+              <div class="eyebrow">STEP 1</div>
+              <h2 id="lesson-title">Choose your lessons</h2>
+              <p class="muted">Pick one, several, or all 78 lessons.</p>
+            </div>
+            <div class="selection-count"><strong id="selected-count">0</strong><span>selected</span></div>
+          </div>
+
+          <div class="selection-tools">
+            <label class="search-box"><span aria-hidden="true">⌕</span><input id="lesson-search" type="search" placeholder="Find a lesson…" autocomplete="off" aria-label="Find a lesson"></label>
+            <div class="tool-buttons">
+              <button id="select-all" class="button button-soft" type="button">Select all</button>
+              <button id="clear-all" class="button button-quiet" type="button">Clear</button>
+            </div>
+          </div>
+          <div class="quick-picks">
+            <button type="button" class="quick-chip" data-range="1-25">Lessons 1–25</button>
+            <button type="button" class="quick-chip" data-range="26-50">Lessons 26–50</button>
+            <button type="button" class="quick-chip" data-range="51-78">Lessons 51–78</button>
+          </div>
+          <div id="lesson-grid" class="lesson-grid" aria-label="Lesson choices"></div>
+          <div class="start-row">
+            <div class="start-summary"><span class="summary-icon">✦</span><span><strong id="word-count">0 cards</strong><small>in selected lessons</small></span></div>
+            <button id="start-review" class="button button-primary" type="button" disabled>Start review <span aria-hidden="true">→</span></button>
+          </div>
+          <p id="setup-error" class="error-message" role="alert" hidden></p>
+        </section>
+        <div class="tip-row"><span class="tip-icon">↻</span><span><strong>Remember:</strong> “Don’t know” cards return to the queue. The session ends only when every selected card is known.</span></div>
+      </section>
+
+      <section id="review-screen" class="screen" hidden>
+        <div class="review-topline">
+          <button id="back-to-lessons" class="back-button" type="button"><span aria-hidden="true">←</span> Lessons</button>
+          <span id="review-lessons-label" class="lesson-label">Selected lessons</span>
+        </div>
+        <div class="review-heading">
+          <div><div class="eyebrow">STEP 2 · ACTIVE RECALL</div><h1>Can you remember it?</h1><p class="muted">Think of the meaning, then tap the card to reveal it.</p></div>
+          <div class="progress-ring" aria-label="Review progress"><strong id="progress-percent">0%</strong><span>known</span></div>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="Known cards" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track"><span id="progress-fill"></span></div>
+        <div class="stats-row">
+          <div class="stat-card"><span class="stat-icon lavender">▤</span><span><strong id="remaining-count">0</strong><small>in queue</small></span></div>
+          <div class="stat-card"><span class="stat-icon green">✓</span><span><strong id="known-count">0</strong><small>known</small></span></div>
+          <div class="stat-card"><span class="stat-icon orange">↻</span><span><strong id="retry-count">0</strong><small>to revisit</small></span></div>
+        </div>
+
+        <div class="flashcard-wrap">
+          <button id="flashcard" class="flashcard" type="button" aria-label="Reveal English meaning">
+            <span class="card-top"><span id="card-lesson" class="card-lesson">LESSON 1</span><span id="card-side" class="card-side">JAPANESE</span></span>
+            <span class="card-center"><span id="card-jp" class="japanese-word" lang="ja">あなた</span><span id="card-en" class="english-meaning" hidden>you</span></span>
+            <span class="card-bottom"><span id="card-hint" class="card-hint"><span aria-hidden="true">↻</span> Tap to reveal meaning</span><span class="card-number" id="card-number">CARD 1</span></span>
+          </button>
+        </div>
+        <div class="answer-actions">
+          <button id="dont-know" class="answer-button dont-know" type="button"><span class="answer-symbol">↻</span><span><strong>Don’t know</strong><small>Bring it back later</small></span></button>
+          <button id="know" class="answer-button know" type="button"><span class="answer-symbol">✓</span><span><strong>Know</strong><small>Remove from this review</small></span></button>
+        </div>
+        <p class="keyboard-hint">Tip: tap the card to flip · keyboard: Space to flip, ← Don’t know, → Know</p>
+      </section>
+
+      <section id="complete-screen" class="screen completion-screen" hidden>
+        <div class="completion-card">
+          <div class="celebration-icon">✦</div>
+          <div class="eyebrow">SESSION COMPLETE</div>
+          <h1>すばらしい！<br><span>Excellent work.</span></h1>
+          <p>You marked every card as <strong>Know</strong>. That’s your selected vocabulary reviewed from start to finish.</p>
+          <div class="completion-stats"><div><strong id="final-known">0</strong><span>cards mastered</span></div><div><strong id="final-lessons">0</strong><span>lessons practised</span></div></div>
+          <button id="review-again" class="button button-primary button-wide" type="button">Review these lessons again <span aria-hidden="true">↻</span></button>
+          <button id="choose-new-lessons" class="button button-soft button-wide" type="button">Choose other lessons</button>
+        </div>
+      </section>
+    </main>
+    <footer><span>あ</span> Keep showing up. One word at a time.</footer>
+  </div>
+</body>
+</html>
