@@ -39,6 +39,15 @@
     return cards;
   };
 
+  function shuffleQueue(cards) {
+    // Fisher–Yates shuffle: randomize the first pass and each retry queue.
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    return cards;
+  }
+
   function saveProgress() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ mastered: [...mastered], sessions: sessions.slice(-100) })); } catch (_) { /* Private browsing or full storage: current session still works. */ }
   }
@@ -149,7 +158,7 @@
       $('setup-error').hidden = false;
       return;
     }
-    queue = deck.slice();
+    queue = shuffleQueue(deck.slice());
     known = new Set();
     activeCard = null;
     isFlipped = false;
@@ -210,7 +219,9 @@
     card.retries += 1;
     mastered.delete(card.id);
     saveProgress();
-    queue.push(card);
+    // Reinsert at a random position, so a missed card is not always next.
+    const insertAt = Math.floor(Math.random() * (queue.length + 1));
+    queue.splice(insertAt, 0, card);
     renderCurrentCard();
     updateProgress();
   }
