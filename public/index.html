@@ -9,9 +9,9 @@
   <link rel="manifest" href="../manifest.json">
   <meta name="description" content="Review Japanese vocabulary from Lessons 1–78 with a simple, mobile-friendly flashcard app.">
   <title>Japanese Vocabulary • Flashcards</title>
-  <link rel="stylesheet" href="../styles.css?v=20261017-kanji-rebuild">
-  <script defer src="../lesson-data-1-78.js?v=20261017-kanji-rebuild"></script>
-  <script defer src="../app.js?v=20261017-kanji-rebuild"></script>
+  <link rel="stylesheet" href="../styles.css?v=20261017-landscape-rebuild-v5">
+  <script defer src="../lesson-data-1-78.js?v=20261017-landscape-rebuild-v5"></script>
+  <script defer src="../app.js?v=20261017-landscape-rebuild-v5"></script>
   <script>if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("../sw.js").catch(() => {}));</script>
 </head>
 <body>
@@ -82,6 +82,11 @@
         <div class="review-topline">
           <button id="back-to-lessons" class="back-button" type="button"><span aria-hidden="true">←</span> Lessons</button>
           <span id="review-lessons-label" class="lesson-label">Selected lessons</span>
+        </div>
+        <div class="landscape-notice" role="status" aria-live="polite">
+          <span class="rotate-symbol" aria-hidden="true">↻</span>
+          <strong>Rotate your phone to landscape</strong>
+          The flashcard, answer buttons, and study progress are available in landscape mode.
         </div>
         <div class="review-heading">
           <div><div class="eyebrow">STEP 2 · ACTIVE RECALL</div><h1>Can you remember it?</h1><p class="muted">Think of the meaning, then tap the card to reveal it.</p></div>
