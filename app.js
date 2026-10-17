@@ -112,14 +112,19 @@
       return;
     }
     visible.forEach(n => {
+      const lessonCards = uniqueCards([n]);
+      const total = lessonCards.length;
+      const learnedCount = lessonCards.reduce((sum, card) => sum + (mastered.has(card.id) ? 1 : 0), 0);
+      const isLearned = total > 0 && learnedCount === total;
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'lesson-option' + (selected.has(n) ? ' selected' : '');
+      button.className = 'lesson-option' + (isLearned ? ' learned' : '') + (selected.has(n) ? ' selected' : '');
       button.setAttribute('aria-pressed', selected.has(n) ? 'true' : 'false');
+      button.setAttribute('aria-label', 'Lesson ' + n + (isLearned ? ', learned' : ', ' + learnedCount + ' of ' + total + ' cards learned'));
       const title = document.createElement('strong');
       title.textContent = 'L' + n;
       const count = document.createElement('small');
-      count.textContent = (DATA[String(n)] || []).length + ' cards';
+      count.textContent = isLearned ? 'Learned ✓' : (learnedCount ? learnedCount + '/' + total + ' learned' : total + ' cards');
       const check = document.createElement('span');
       check.className = 'checkmark';
       check.setAttribute('aria-hidden', 'true');
@@ -149,6 +154,7 @@
       $(screenId).hidden = screenId !== id;
     });
     if (id === 'progress-screen') renderProgress();
+    if (id === 'setup-screen') renderLessonGrid();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -220,6 +226,7 @@
     known.add(card.id);
     mastered.add(card.id);
     saveProgress();
+    renderLessonGrid();
     updateProgress();
     if (queue.length === 0) showCompletion();
     else renderCurrentCard();
@@ -231,6 +238,7 @@
     card.retries += 1;
     mastered.delete(card.id);
     saveProgress();
+    renderLessonGrid();
     // Reinsert at a random position, so a missed card is not always next.
     const insertAt = Math.floor(Math.random() * (queue.length + 1));
     queue.splice(insertAt, 0, card);
