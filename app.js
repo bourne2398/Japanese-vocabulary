@@ -183,8 +183,13 @@
     $('flashcard').setAttribute('aria-label', 'Reveal English meaning for ' + activeCard.jp);
     $('card-jp').hidden = false;
     $('card-en').hidden = true;
-    const hasKanji = (value) => /[\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ]/.test(value || '');
-    const kanjiForm = hasKanji(activeCard.kanji) ? activeCard.kanji : (hasKanji(activeCard.jp) && activeCard.furi && activeCard.jp !== activeCard.furi ? activeCard.jp : '');
+    // Prefer the explicit kanji field; fall back to a kanji-bearing jp value.
+    // This keeps the reading unchanged and shows the written form on its own line.
+    const hasKanji = (value) => /[\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ]/u.test(String(value || ''));
+    const storedKanji = String(activeCard.kanji || '').trim();
+    const jpForm = String(activeCard.jp || '').trim();
+    const reading = String(activeCard.furi || '').trim();
+    const kanjiForm = hasKanji(storedKanji) ? storedKanji : (hasKanji(jpForm) && jpForm !== reading ? jpForm : '');
     $('card-kanji').textContent = kanjiForm;
     $('card-kanji').hidden = !kanjiForm;
     $('card-jp').textContent = activeCard.furi || activeCard.jp || '—';
