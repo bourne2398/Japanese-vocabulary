@@ -1,10 +1,10 @@
-const CACHE_NAME = 'japanese-vocabulary-rebuild-20261017-v4';
+const CACHE_NAME = 'japanese-vocabulary-rebuild-20261017-v5';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=20261017-kanji-rebuild',
-  './app.js?v=20261017-kanji-rebuild',
-  './lesson-data-1-78.js?v=20261017-kanji-rebuild',
+  './styles.css?v=20261017-landscape-rebuild-v5',
+  './app.js?v=20261017-landscape-rebuild-v5',
+  './lesson-data-1-78.js?v=20261017-landscape-rebuild-v5',
   './manifest.json',
   './icon.svg'
 ];
